@@ -1,5 +1,5 @@
 from typing import TypeAlias
-from at_research.schemas import SignalSchema, ScoreSchema, AlphaSchema, UniverseSchema
+from utils.schemas import SignalSchema, ScoreSchema, AlphaSchema, UniverseSchema
 import dataframely as dy
 
 Signals: TypeAlias = dy.DataFrame[SignalSchema]

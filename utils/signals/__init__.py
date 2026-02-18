@@ -1,6 +1,6 @@
 import polars as pl
-from at_research.models import Signals, Scores, Alphas, Universe
-from at_research.schemas import ScoreSchema, AlphaSchema
+from utils.models import Signals, Scores, Alphas, Universe
+from utils.schemas import ScoreSchema, AlphaSchema
 from atium.models import IdioVol
 import dataframely as dy
 
