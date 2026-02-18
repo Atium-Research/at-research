@@ -4,7 +4,7 @@ from utils.schemas import ScoreSchema, AlphaSchema
 from atium.models import IdioVol
 import dataframely as dy
 
-def compute_scores(signals: Signals) -> Scores:
+def compute_scores(signals: Signals, name: str) -> Scores:
     return ScoreSchema.validate(
         signals
         .with_columns(
@@ -12,12 +12,13 @@ def compute_scores(signals: Signals) -> Scores:
             .sub(pl.col('signal').mean())
             .truediv(pl.col('signal').std())
             .over('date')
-            .alias('score')
+            .alias('score'),
+            pl.lit(name).alias('name')
         )
         .select('date', 'ticker', 'name', 'score')
     )
 
-def compute_alphas(universe: Universe, scores: Scores, idio_vol: IdioVol) -> Alphas:
+def compute_alphas(universe: Universe, scores: Scores, idio_vol: IdioVol, name: str) -> Alphas:
     return AlphaSchema.validate(
         universe
         .join(scores, on=['date', 'ticker'], how='left')
@@ -27,7 +28,8 @@ def compute_alphas(universe: Universe, scores: Scores, idio_vol: IdioVol) -> Alp
             .mul(pl.col('score'))
             .mul(pl.col('idio_vol'))
             .fill_null(0)
-            .alias('alpha')
+            .alias('alpha'),
+            pl.lit(name).alias('name')
         )
         .select('date', 'ticker', 'name', 'alpha')
     )

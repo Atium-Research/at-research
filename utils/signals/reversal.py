@@ -3,16 +3,16 @@ from utils.models import Signals
 from utils.schemas import SignalSchema
 
 
-def compute(returns: pl.DataFrame, lookback: int = 21) -> Signals:
+def compute(returns: pl.DataFrame, name: str, lookback: int = 21) -> Signals:
     return SignalSchema.validate(
         returns
         .with_columns(
-            pl.lit(f'reversal_{lookback}').alias('name'),
             pl.col('return')
             .log1p()
             .rolling_sum(lookback)
             .over('ticker')
-            .alias('signal')
+            .alias('signal'),
+            pl.lit(name).alias('name')
         )
         .select('date', 'ticker', 'name', 'signal')
     )

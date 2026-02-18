@@ -4,19 +4,19 @@ class SignalSchema(dy.Schema):
     date = dy.Date()
     ticker = dy.String()
     name = dy.String()
-    signal = dy.Float()
+    signal = dy.Float(nullable=True)
 
 class ScoreSchema(dy.Schema):
     date = dy.Date()
     ticker = dy.String()
     name = dy.String()
-    score = dy.Float()
+    score = dy.Float(nullable=True)
 
 class AlphaSchema(dy.Schema):
     date = dy.Date()
     ticker = dy.String()
     name = dy.String()
-    alpha = dy.Float()
+    alpha = dy.Float(nullable=True)
 
 class UniverseSchema(dy.Schema):
     date = dy.Date()
