@@ -1,0 +1,16 @@
+[project]
+name = "at-research"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "altair>=6.0.0",
+    "atium>=0.1.1",
+    "bear-lake>=0.1.5",
+    "dataframely>=2.7.0",
+    "marimo>=0.19.11",
+    "numpy>=2.4.2",
+    "pandas>=3.0.1",
+    "polars>=1.38.1",
+]
