@@ -1,7 +1,8 @@
 import datetime as dt
 import bear_lake as bl
 import polars as pl
-from atium.models import Alphas
+from atium.types import Alphas
+from atium.schemas import AlphasSchema
 
 
 class BearLakeAlphaProvider:
@@ -23,12 +24,11 @@ class BearLakeAlphaProvider:
         )
 
     def get(self, date_: dt.date) -> Alphas:
-        return Alphas.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))
+        return AlphasSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))
 
+    @classmethod
+    def from_df(cls, alphas: Alphas) -> 'BearLakeAlphaProvider':
+        instance = cls.__new__(cls)
+        instance.data = alphas
+        return instance
 
-class CustomAlphaProvider:
-    def __init__(self, alphas: pl.DataFrame) -> None:
-        self.alphas = Alphas.validate(alphas)
-
-    def get(self, date_: dt.date) -> Alphas:
-        return self.alphas.filter(pl.col('date').eq(date_)).sort('date', 'ticker')

@@ -1,7 +1,8 @@
 import datetime as dt
 import bear_lake as bl
 import polars as pl
-from atium.models import Returns
+from atium.types import Returns
+from atium.schemas import ReturnsSchema
 
 
 class BearLakeReturnsProvider:
@@ -19,4 +20,4 @@ class BearLakeReturnsProvider:
         )
 
     def get(self, date_: dt.date) -> Returns:
-        return Returns.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))
+        return ReturnsSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))

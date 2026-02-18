@@ -1,18 +1,18 @@
 import polars as pl
-from utils.models import Signals
-from utils.schemas import SignalSchema
+from atium.types import Signals
+from atium.schemas import SignalsSchema
 
 
-def compute(returns: pl.DataFrame, name: str, lookback: int = 21) -> Signals:
-    return SignalSchema.validate(
+def compute(returns: pl.DataFrame, lookback: int) -> Signals:
+    return SignalsSchema.validate(
         returns
         .with_columns(
             pl.col('return')
             .log1p()
             .rolling_sum(lookback)
+            .mul(-1)
             .over('ticker')
             .alias('signal'),
-            pl.lit(name).alias('name')
         )
-        .select('date', 'ticker', 'name', 'signal')
+        .select('date', 'ticker', 'signal')
     )

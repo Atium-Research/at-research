@@ -1,7 +1,8 @@
 import datetime as dt
 import bear_lake as bl
 import polars as pl
-from atium.models import FactorLoadings, FactorCovariances, IdioVol
+from atium.types import FactorLoadings, FactorCovariances, IdioVol
+from atium.schemas import FactorLoadingsSchema, FactorCovariancesSchema, IdioVolSchema
 
 
 class BearLakeFactorLoadingsProvider:
@@ -22,7 +23,7 @@ class BearLakeFactorLoadingsProvider:
         )
 
     def get(self, date_: dt.date) -> FactorLoadings:
-        return FactorLoadings.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker', 'factor'))
+        return FactorLoadingsSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker', 'factor'))
 
 
 class BearLakeFactorCovariancesProvider:
@@ -38,7 +39,7 @@ class BearLakeFactorCovariancesProvider:
         )
 
     def get(self, date_: dt.date) -> FactorCovariances:
-        return FactorCovariances.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'factor_1', 'factor_2'))
+        return FactorCovariancesSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'factor_1', 'factor_2'))
 
 
 class BearLakeIdioVolProvider:
@@ -59,4 +60,4 @@ class BearLakeIdioVolProvider:
         )
 
     def get(self, date_: dt.date) -> IdioVol:
-        return IdioVol.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))
+        return IdioVolSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))

@@ -14,7 +14,7 @@ from utils.providers import (
     BearLakeFactorCovariancesProvider,
     BearLakeIdioVolProvider,
     BearLakeBenchmarkWeightsProvider,
-    CustomAlphaProvider,
+    BearLakeAlphaProvider
 )
 import polars as pl
 import bear_lake as bl
@@ -34,7 +34,7 @@ def run_backtest(
     min_position_dollars: float = 1,
 ) -> BacktestResult:
     strategy = OptimizationStrategy(
-        alpha_provider=CustomAlphaProvider(alphas),
+        alpha_provider=BearLakeAlphaProvider.from_df(alphas),
         benchmark_weights_provider=BearLakeBenchmarkWeightsProvider(db, start, end),
         risk_model_constructor=FactorRiskModelConstructor(
             factor_loadings=BearLakeFactorLoadingsProvider(db, start, end),

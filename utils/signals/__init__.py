@@ -1,11 +1,11 @@
 import polars as pl
-from utils.models import Signals, Scores, Alphas, Universe
-from utils.schemas import ScoreSchema, AlphaSchema
-from atium.models import IdioVol
+from atium.types import Signals, Scores, Alphas, Universe
+from atium.schemas import ScoresSchema, AlphasSchema
+from atium.types import IdioVol
 import dataframely as dy
 
 def compute_scores(signals: Signals, name: str) -> Scores:
-    return ScoreSchema.validate(
+    return ScoresSchema.validate(
         signals
         .with_columns(
             pl.col('signal')
@@ -19,7 +19,7 @@ def compute_scores(signals: Signals, name: str) -> Scores:
     )
 
 def compute_alphas(universe: Universe, scores: Scores, idio_vol: IdioVol, name: str) -> Alphas:
-    return AlphaSchema.validate(
+    return AlphasSchema.validate(
         universe
         .join(scores, on=['date', 'ticker'], how='left')
         .join(idio_vol, on=['date', 'ticker'], how='left')

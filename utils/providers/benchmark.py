@@ -1,7 +1,8 @@
 import datetime as dt
 import bear_lake as bl
 import polars as pl
-from atium.models import BenchmarkWeights
+from atium.types import BenchmarkWeights
+from atium.schemas import BenchmarkWeightsSchema
 
 
 class BearLakeBenchmarkWeightsProvider:
@@ -14,4 +15,4 @@ class BearLakeBenchmarkWeightsProvider:
         )
 
     def get(self, date_: dt.date) -> BenchmarkWeights:
-        return BenchmarkWeights.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))
+        return BenchmarkWeightsSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))
