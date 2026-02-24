@@ -11,16 +11,18 @@ def _():
     import altair as alt
     import great_tables as gt
     import datetime as dt
+    from utils.data import load_benchmark_returns
+    from utils.clients import get_bear_lake_client
 
-    return alt, dt, gt, mo, pl
+    return alt, dt, get_bear_lake_client, gt, load_benchmark_returns, mo, pl
 
 
 @app.cell
 def _(pl):
     results = (
-        pl.read_parquet('data/alphas/*.parquet', include_file_paths="file_path")
+        pl.read_parquet('data/portfolios/*.parquet', include_file_paths="file_path")
         .with_columns(
-            pl.col('file_path').str.extract(r"alphas/([^/]+)\.parquet").alias('signal')
+            pl.col('file_path').str.extract(r"portfolios/([^/]+)\.parquet").alias('portfolio')
         )
     )
     return (results,)
@@ -34,69 +36,85 @@ def _(dt, mo, results):
     start_date = mo.ui.date(start=default_start, stop=default_end, value=default_start, label="Start")
     end_date = mo.ui.date(start=default_start, stop=default_end, value=default_end, label="End")
 
-    signal_names = results['signal'].unique().sort().to_list()
+    portfolio_names = results['portfolio'].unique().sort().to_list()
 
-    signals_multiselect = mo.ui.multiselect(
-        options=signal_names, 
-        label="Signals",
-        value=signal_names
+    portfolios_multiselect = mo.ui.multiselect(
+        options=portfolio_names, 
+        label="Portfolios",
+        value=portfolio_names
     )
 
-    mo.vstack([start_date, end_date, signals_multiselect])
-    return end_date, signals_multiselect, start_date
+    mo.vstack([start_date, end_date, portfolios_multiselect])
+    return end_date, portfolios_multiselect, start_date
 
 
 @app.cell
-def _(end_date, pl, results, signals_multiselect, start_date):
+def _(end_date, pl, portfolios_multiselect, results, start_date):
     start = start_date.value
     end = end_date.value
-    selected_signals = signals_multiselect.value
+    selected_portfolios = portfolios_multiselect.value
 
     results_agg = (
         results
         .filter(
             pl.col('date').is_between(start, end),
-            pl.col('signal').is_in(selected_signals),
+            pl.col('portfolio').is_in(selected_portfolios),
         )
-        .group_by('date', 'signal')
+        .group_by('date', 'portfolio')
         .agg(
-            pl.col('weight').sum(),
-            pl.col('value').sum(),
             pl.col('return').mul(pl.col('weight')).sum(),
-            pl.col('pnl').sum(),
         )
-        .sort('date', 'signal')
+        .sort('date', 'portfolio')
         .with_columns(
             pl.col('return')
             .add(1)
             .cum_prod()
             .sub(1)
-            .over('signal')
+            .over('portfolio')
             .alias('cumulative_return')
         )
     )
-    return (results_agg,)
+    return end, results_agg, start
 
 
 @app.cell
-def _(alt, results_agg):
+def _(end, get_bear_lake_client, load_benchmark_returns, pl, start):
+    db = get_bear_lake_client()
+    benchmark_returns = (
+        load_benchmark_returns(db, start, end)
+        .select(
+            pl.col('date'),
+            pl.lit('benchmark').alias('portfolio'),
+            pl.col('return'),
+            pl.col('return')
+            .add(1)
+            .cum_prod()
+            .sub(1)
+            .alias('cumulative_return')
+        )
+    )
+    return (benchmark_returns,)
+
+
+@app.cell
+def _(alt, benchmark_returns, pl, results_agg):
     (
-        alt.Chart(results_agg)
+        alt.Chart(pl.concat([results_agg, benchmark_returns]))
         .mark_line()
         .encode(
             x=alt.X('date', title=""),
             y=alt.Y('cumulative_return', title='Cumulative Return (%)').axis(format='%'),
-            color=alt.Color('signal', title="Signal")
+            color=alt.Color('portfolio', title="Portfolio")
         )
     )
     return
 
 
 @app.cell
-def _(pl, results_agg):
+def _(benchmark_returns, pl, results_agg):
     results_summary = (
-        results_agg
-        .group_by('signal')
+        pl.concat([results_agg, benchmark_returns])
+        .group_by('portfolio')
         .agg(
             pl.col('cumulative_return').last().alias('total_return'),
             pl.col('return').mean().mul(252).alias('mean_return'),

@@ -1,11 +1,11 @@
 from atium.backtester import Backtester
 from atium.optimizer import MVO
 from atium.costs import LinearCost
-from atium.objectives import MaxUtilityWithTargetActiveRisk
-from atium.optimizer_constraints import LongOnly, FullyInvested
+from atium.objectives import Objective
+from atium.optimizer_constraints import OptimizerConstraint
 from atium.risk_model import FactorRiskModelConstructor
 from atium.strategy import OptimizationStrategy
-from atium.trading_constraints import MinPositionSize
+from atium.trading_constraints import TradingConstraint
 from atium.trade_generator import TradeGenerator
 from utils.providers import (
     BearLakeCalendarProvider,
@@ -14,7 +14,8 @@ from utils.providers import (
     BearLakeFactorCovariancesProvider,
     BearLakeIdioVolProvider,
     BearLakeBenchmarkWeightsProvider,
-    BearLakeAlphaProvider
+    BearLakeAlphaProvider,
+    BearLakeBetasProvider
 )
 from atium.types import PositionResults
 import polars as pl
@@ -26,25 +27,27 @@ def run_backtest(
     db: bl.Database,
     start: dt.date,
     end: dt.date,
-    alphas: pl.DataFrame,
+    objective: Objective,
     *,
-    target_active_risk: float = 0.05,
+    alphas: pl.DataFrame | None = None,
     cost_bps: float = 10,
     initial_capital: float = 100_000,
     rebalance_frequency: str = 'daily',
-    min_position_dollars: float = 1,
+    optimizer_constraints: list[OptimizerConstraint] = [],
+    trading_constraints: list[TradingConstraint] = [],
 ) -> PositionResults:
     strategy = OptimizationStrategy(
-        alpha_provider=BearLakeAlphaProvider.from_df(alphas),
+        alpha_provider=BearLakeAlphaProvider.from_df(alphas) if alphas is not None else None,
         benchmark_weights_provider=BearLakeBenchmarkWeightsProvider(db, start, end),
+        beta_provider=BearLakeBetasProvider(db, start, end),
         risk_model_constructor=FactorRiskModelConstructor(
             factor_loadings=BearLakeFactorLoadingsProvider(db, start, end),
             factor_covariances=BearLakeFactorCovariancesProvider(db, start, end),
             idio_vol=BearLakeIdioVolProvider(db, start, end)
         ),
         optimizer=MVO(
-            objective=MaxUtilityWithTargetActiveRisk(target_active_risk=target_active_risk),
-            constraints=[LongOnly(), FullyInvested()],
+            objective=objective,
+            constraints=optimizer_constraints,
         ),
     )
 
@@ -59,6 +62,6 @@ def run_backtest(
         strategy=strategy,
         cost_model=LinearCost(bps=cost_bps),
         trade_generator=TradeGenerator(
-            constraints=[MinPositionSize(dollars=min_position_dollars)]
+            constraints=trading_constraints
         )
     )

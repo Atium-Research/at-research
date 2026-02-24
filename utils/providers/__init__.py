@@ -3,6 +3,7 @@ from .returns import BearLakeReturnsProvider
 from .risk_model import BearLakeFactorLoadingsProvider, BearLakeFactorCovariancesProvider, BearLakeIdioVolProvider
 from .benchmark import BearLakeBenchmarkWeightsProvider
 from .alpha import BearLakeAlphaProvider
+from .betas import BearLakeBetasProvider
 
 __all__ = [
     'BearLakeCalendarProvider',
@@ -12,4 +13,5 @@ __all__ = [
     'BearLakeIdioVolProvider',
     'BearLakeBenchmarkWeightsProvider',
     'BearLakeAlphaProvider',
+    'BearLakeBetasProvider'
 ]

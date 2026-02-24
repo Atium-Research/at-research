@@ -28,3 +28,10 @@ def load_idio_vol(db: bl.Database, start: dt.date, end: dt.date) -> pl.DataFrame
         .drop('year')
         .sort('date', 'ticker')
     )
+
+def load_benchmark_returns(db: bl.Database, start: dt.date, end: dt.date) -> pl.DataFrame:
+    return db.query(
+        bl.table('benchmark_returns')
+        .filter(pl.col('date').is_between(start, end))
+        .sort('date')
+    )

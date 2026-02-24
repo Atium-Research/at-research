@@ -153,7 +153,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "altair", specifier = ">=6.0.0" },
-    { name = "atium", specifier = ">=0.1.5" },
+    { name = "atium", specifier = ">=0.1.8" },
     { name = "bear-lake", specifier = ">=0.1.5" },
     { name = "dataframely", specifier = ">=2.7.0" },
     { name = "great-tables", specifier = ">=0.20.0" },
@@ -165,7 +165,7 @@ requires-dist = [
 
 [[package]]
 name = "atium"
-version = "0.1.5"
+version = "0.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bear-lake" },
@@ -175,9 +175,9 @@ dependencies = [
     { name = "polars" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cb/8f/ca15bd9bb99771ca1cddc651b4c2691acb108fcf8183ed979128261a74cb/atium-0.1.5.tar.gz", hash = "sha256:0e8c5d9fc75a35a4db64d77122321f336fa3dc500988900b9a97dcf827b1f1ef", size = 11233, upload-time = "2026-02-24T02:46:47.303Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/16/9e0ac22b2399e3a8c3f3b135b6b7170784df6b81d11a3ee4dd63b97d4441/atium-0.1.8.tar.gz", hash = "sha256:5c79f6f36d3a6471925760ed8d3acfa1d95b73731ac62e64100d1324d2818b5b", size = 11630, upload-time = "2026-02-24T19:55:47.107Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0f/90/c5db01ea3027bcca4a735ce50f03b0100265f52b98bd505d2bdfe4790e68/atium-0.1.5-py3-none-any.whl", hash = "sha256:4e86dd812a50600f01f3f8c05f6c967525d0f6d724a6085e69bdd88239d80d5d", size = 13911, upload-time = "2026-02-24T02:46:47.937Z" },
+    { url = "https://files.pythonhosted.org/packages/91/a0/f2713cab696fd5e1479d4ae68e8f204a588dbe29ef018f23064c31d55606/atium-0.1.8-py3-none-any.whl", hash = "sha256:9f5c9697e3420fc529c19be83069fdada6599057d4eef5ead8bf1a459d0d99e6", size = 14317, upload-time = "2026-02-24T19:55:46.077Z" },
 ]
 
 [[package]]
