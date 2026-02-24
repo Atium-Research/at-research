@@ -1,4 +1,4 @@
-from atium.backtester import Backtester, BacktestResult
+from atium.backtester import Backtester
 from atium.optimizer import MVO
 from atium.costs import LinearCost
 from atium.objectives import MaxUtilityWithTargetActiveRisk
@@ -16,6 +16,7 @@ from utils.providers import (
     BearLakeBenchmarkWeightsProvider,
     BearLakeAlphaProvider
 )
+from atium.types import PositionResults
 import polars as pl
 import bear_lake as bl
 import datetime as dt
@@ -32,7 +33,7 @@ def run_backtest(
     initial_capital: float = 100_000,
     rebalance_frequency: str = 'daily',
     min_position_dollars: float = 1,
-) -> BacktestResult:
+) -> PositionResults:
     strategy = OptimizationStrategy(
         alpha_provider=BearLakeAlphaProvider.from_df(alphas),
         benchmark_weights_provider=BearLakeBenchmarkWeightsProvider(db, start, end),
@@ -53,9 +54,8 @@ def run_backtest(
         end=end,
         rebalance_frequency=rebalance_frequency,
         initial_capital=initial_capital,
-        calendar=BearLakeCalendarProvider(db, start, end),
-        returns=BearLakeReturnsProvider(db, start, end),
-        benchmark=BearLakeBenchmarkWeightsProvider(db, start, end),
+        calendar_provider=BearLakeCalendarProvider(db, start, end),
+        returns_provider=BearLakeReturnsProvider(db, start, end),
         strategy=strategy,
         cost_model=LinearCost(bps=cost_bps),
         trade_generator=TradeGenerator(
