@@ -29,7 +29,7 @@ def _(pl):
 
 @app.cell
 def _(dt, mo, results):
-    default_start = dt.date(2026, 1, 3)
+    default_start = dt.date(2023, 1, 1)
     default_end = dt.date.today()
 
     start_date = mo.ui.date(start=default_start, stop=default_end, value=default_start, label="Start")
@@ -76,8 +76,6 @@ def _(end_date, pl, results, signals_multiselect, start_date):
             .alias('cumulative_return')
         )
     )
-
-    results_agg
     return (results_agg,)
 
 
