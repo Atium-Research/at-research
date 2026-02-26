@@ -25,6 +25,12 @@ class BearLakeFactorLoadingsProvider:
     def get(self, date_: dt.date) -> FactorLoadings:
         return FactorLoadingsSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker', 'factor'))
 
+    @classmethod
+    def from_df(cls, factor_loadings: FactorLoadings) -> 'BearLakeFactorLoadingsProvider':
+        instance = cls.__new__(cls)
+        instance.data = factor_loadings
+        return instance
+
 
 class BearLakeFactorCovariancesProvider:
     def __init__(self, db: bl.Database, start: dt.date, end: dt.date) -> None:
@@ -40,6 +46,12 @@ class BearLakeFactorCovariancesProvider:
 
     def get(self, date_: dt.date) -> FactorCovariances:
         return FactorCovariancesSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'factor_1', 'factor_2'))
+
+    @classmethod
+    def from_df(cls, factor_covariances: FactorCovariances) -> 'BearLakeFactorCovariancesProvider':
+        instance = cls.__new__(cls)
+        instance.data = factor_covariances
+        return instance
 
 
 class BearLakeIdioVolProvider:
@@ -61,3 +73,9 @@ class BearLakeIdioVolProvider:
 
     def get(self, date_: dt.date) -> IdioVol:
         return IdioVolSchema.validate(self.data.filter(pl.col('date').eq(date_)).sort('date', 'ticker'))
+
+    @classmethod
+    def from_df(cls, idio_vol: IdioVol) -> 'BearLakeIdioVolProvider':
+        instance = cls.__new__(cls)
+        instance.data = idio_vol
+        return instance
