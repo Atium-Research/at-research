@@ -8,7 +8,17 @@ db = get_bear_lake_client()
 start = dt.date(2023, 1, 1)
 end = dt.date.today()
 
-# Run backtest
+# Unconstrained
+results = run_backtest(
+    db=db,
+    start=start,
+    end=end,
+    objective=MinVarianceWithTargetActiveRisk(target_active_risk=.05),
+    optimizer_constraints=[FullyInvested()],
+)
+results.write_parquet(f'data/portfolios/targetactiverisk_unconstrained.parquet')
+
+# Long only
 results = run_backtest(
     db=db,
     start=start,
